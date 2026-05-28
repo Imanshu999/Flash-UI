@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build React Vite Android APK
 on: [push]
 
 jobs:
@@ -13,29 +13,32 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install Project Dependencies
+        run: npm install
+
+      - name: Build Vite Project
+        run: npm run build
+
       - name: Install Cordova
         run: npm install -g cordova
 
       - name: Create Cordova Project
         run: |
-          cordova create my-app com.example.myapp MyApp
+          cordova create my-app com.takano3d.myapp TakanoApp
           cd my-app
           cordova platform add android
-          
-      - name: Copy HTML files to App
+
+      - name: Copy Vite Build Files to Cordova
         run: |
           rm -rf my-app/www/*
-          cp -r index.html my-app/www/
-          # अगर आपके पास और भी फाइल्स/फोल्डर्स हैं, तो उन्हें भी यहाँ कॉपी करें, जैसे:
-          # cp -r css my-app/www/ 2>/dev/null || true
-          # cp -r js my-app/www/ 2>/dev/null || true
+          cp -r dist/* my-app/www/
 
-      - name: Build APK
+      - name: Build Android APK
         run: |
           cd my-app
           cordova build android --bundle
 
-      - name: Upload APK Release
+      - name: Upload Finished APK
         uses: actions/upload-artifact@v3
         with:
           name: app-release-apk
