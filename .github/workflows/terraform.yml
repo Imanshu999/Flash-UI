@@ -1,0 +1,42 @@
+name: Build Android APK
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Cordova
+        run: npm install -g cordova
+
+      - name: Create Cordova Project
+        run: |
+          cordova create my-app com.example.myapp MyApp
+          cd my-app
+          cordova platform add android
+          
+      - name: Copy HTML files to App
+        run: |
+          rm -rf my-app/www/*
+          cp -r index.html my-app/www/
+          # अगर आपके पास और भी फाइल्स/फोल्डर्स हैं, तो उन्हें भी यहाँ कॉपी करें, जैसे:
+          # cp -r css my-app/www/ 2>/dev/null || true
+          # cp -r js my-app/www/ 2>/dev/null || true
+
+      - name: Build APK
+        run: |
+          cd my-app
+          cordova build android --bundle
+
+      - name: Upload APK Release
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release-apk
+          path: my-app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
