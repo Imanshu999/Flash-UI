@@ -38,10 +38,11 @@ jobs:
     - name: Build Web Application
       run: npm run build
 
-    - name: Configure and Sync Capacitor Android
+    - name: Force Recreate Fresh Android Project
       run: |
         npx cap telemetry off
-        npx cap sync
+        rm -rf android/
+        npx cap add android
 
     - name: Setup Fresh Gradle 8.7
       uses: gradle/actions/setup-gradle@v3
