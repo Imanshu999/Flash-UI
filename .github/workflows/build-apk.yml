@@ -43,13 +43,13 @@ jobs:
         npx cap add android
         npx cap sync
 
-    - name: Force Clear Corrupted Gradle Cache
-      run: |
-        rm -rf /home/runner/.gradle/caches/
-        rm -rf android/.gradle/
+    - name: Setup Fresh Gradle 8.7
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.7'
 
     - name: Build Debug APK with Gradle
       run: |
         cd android
         chmod +x gradlew
-        ./gradlew assembleDebug --no-daemon
+        gradle assembleDebug --no-daemon
