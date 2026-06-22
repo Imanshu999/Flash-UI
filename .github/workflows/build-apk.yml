@@ -47,7 +47,7 @@ jobs:
       run: |
         cd android
         chmod +x gradlew
-        ./gradlew assembleDebug -Dgradle.user.home=.gradle_home
+        ./gradlew assembleDebug --no-daemon --stacktrace -Dorg.gradle.caching=false
 
     - name: Upload Finished APK Artifact
       uses: actions/upload-artifact@v4
