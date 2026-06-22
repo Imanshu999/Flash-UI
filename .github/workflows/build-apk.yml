@@ -18,19 +18,18 @@ jobs:
       with:
         node-version: 18
 
-    - name: Set up JDK 21
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
-        java-version: '21'
+        java-version: '17'
 
-    - name: Install Project Dependencies
-      run: npm install
+    - name: Install Dependencies
+      run: |
+        npm install
+        npm install @capacitor/core @capacitor/cli @capacitor/android
 
-    - name: Install Capacitor Core and CLI
-      run: npm install @capacitor/core @capacitor/cli @capacitor/android
-
-    - name: Create Env File for Build
+    - name: Create Env File
       run: |
         echo "GEMINI_API_KEY=dummy_key" > .env
         echo "VITE_GEMINI_API_KEY=dummy_key" >> .env
@@ -38,25 +37,20 @@ jobs:
     - name: Build Web Application
       run: npm run build
 
-    - name: Force Recreate Fresh Android Project
-      run: |
-        npx cap telemetry off
-        rm -rf android/
-        npx cap add android
-
-    - name: Setup Fresh Gradle 8.7
-      uses: gradle/actions/setup-gradle@v3
+    - name: Clear Old Tracking and Setup Android via Action
+      uses: ionic-team/capacitor-action@v1
       with:
-        gradle-version: '8.7'
+        platform: android
+        command: sync
 
-    - name: Build Debug APK with Gradle
+    - name: Build Debug APK via Gradle
       run: |
         cd android
         chmod +x gradlew
-        gradle :app:assembleDebug --no-daemon
+        ./gradlew assembleDebug --no-daemon
 
     - name: Upload Finished APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: Flash-UI-Debug-APK
-        path: android/**/*.apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
