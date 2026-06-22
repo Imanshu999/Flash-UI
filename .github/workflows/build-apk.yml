@@ -24,24 +24,25 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
 
-    - name: Install Dependencies
+    - name: Install Project Dependencies
       run: |
         npm install
-        npm install @capacitor/core @capacitor/cli @capacitor/android
+        # मिसिंग आइकन लाइब्रेरी को जबरदस्ती इंस्टॉल कर रहे हैं
+        npm install lucide-react @capacitor/core @capacitor/cli @capacitor/android
 
     - name: Create Env File
       run: |
         echo "GEMINI_API_KEY=dummy_key" > .env
         echo "VITE_GEMINI_API_KEY=dummy_key" >> .env
 
-    - name: Build Web Application (Ignore TS)
+    - name: Build Web Application
       run: |
         npx vite build
 
     - name: Manual Capacitor Android Sync
       run: |
         npx cap telemetry off
-        # अगर कॉन्फ़िगरेशन में कोई और फोल्डर नाम है, तो हम बैकअप बना देते हैं ताकि फेल न हो
+        # सारे संभावित फोल्डर्स का बैकअप
         cp -r dist/ build/ || true
         cp -r dist/ www/ || true
         npx cap sync android
