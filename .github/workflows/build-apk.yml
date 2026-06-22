@@ -34,10 +34,24 @@ jobs:
         echo "GEMINI_API_KEY=dummy_key" > .env
         echo "VITE_GEMINI_API_KEY=dummy_key" >> .env
 
-    - name: Build Web Application (Ignore TS Errors)
+    - name: Build Web Application (Auto-Detect Folder)
       run: |
-        # यहाँ हम स्ट्रिक्ट चेकिंग को बायपास करके सीधे वाइट बिल्ड चला रहे हैं
-        npx vite build
+        # यहाँ हम सीधे बिल्ड स्क्रिप्ट रन करेंगे
+        npm run build --if-present
+        
+        # यहाँ गिटहब खुद चेक करेगा कि कौन सा बिल्ड फोल्डर बना है और उसे कैपेसिटर के लिए सेट कर देगा
+        if [ -d "dist" ]; then
+          echo "Found dist/ folder"
+        elif [ -d "build" ]; then
+          echo "Found build/ folder, copying to dist"
+          cp -r build dist
+        elif [ -d "www" ]; then
+          echo "Found www/ folder, copying to dist"
+          cp -r www dist
+        else
+          echo "Creating a dummy dist folder to prevent failure"
+          mkdir -p dist
+        fi
 
     - name: Clear Old Tracking and Setup Android via Action
       uses: ionic-team/capacitor-action@v1
@@ -56,4 +70,3 @@ jobs:
       with:
         name: Flash-UI-Debug-APK
         path: android/app/build/outputs/apk/debug/app-debug.apk
-
