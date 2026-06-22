@@ -17,7 +17,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 18
-        cache: 'npm'
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -28,13 +27,13 @@ jobs:
     - name: Install Project Dependencies
       run: npm install
 
-    - name: Install Capacitor Core & CLI
+    - name: Install Capacitor Core and CLI
       run: npm install @capacitor/core @capacitor/cli @capacitor/android
 
     - name: Create Env File for Build
       run: |
-        echo "GEMINI_API_KEY=dummy_key_for_building_apk" > .env
-        echo "VITE_GEMINI_API_KEY=dummy_key_for_building_apk" >> .env
+        echo "GEMINI_API_KEY=dummy_key" > .env
+        echo "VITE_GEMINI_API_KEY=dummy_key" >> .env
 
     - name: Build Web Application
       run: npm run build
