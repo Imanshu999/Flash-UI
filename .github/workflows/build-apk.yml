@@ -21,7 +21,7 @@ jobs:
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
-        distribution: 'zulu'
+        distribution: 'temurin'
         java-version: '17'
 
     - name: Install Project Dependencies
@@ -29,23 +29,15 @@ jobs:
         npm install
         npm install lucide-react @capacitor/core @capacitor/cli @capacitor/android
 
-    - name: Create Env File
+    - name: Hotfix - Remove Broken Component
       run: |
-        echo "GEMINI_API_KEY=dummy_key" > .env
-        echo "VITE_GEMINI_API_KEY=dummy_key" >> .env
-
-    - name: Hotfix - Remove Broken Component Line
-      run: |
-        # src/App.jsx के अंदर से वो एरर देने वाली ChatContainer वाली लाइन को पूरी तरह साफ कर रहे हैं
-        sed -i '/<ChatContainer \/>/d' src/App.jsx || true
-        sed -i '/ChatContainer/d' src/App.jsx || true
+        sed -i '/<ChatContainer/d' src/App.jsx || true
+        sed -i '/import.*ChatContainer/d' src/App.jsx || true
 
     - name: Build Web Application
-      run: |
-        # अब यह बिना किसी एरर के सीधा वाइट बिल्ड निकालेगा
-        npx vite build
+      run: npx vite build
 
-    - name: Manual Capacitor Android Sync
+    - name: Capacitor Sync
       run: |
         npx cap telemetry off
         mkdir -p dist build www
@@ -56,8 +48,9 @@ jobs:
     - name: Build Debug APK via Gradle
       run: |
         cd android
+        # ये कमांड ग्रैडल के साथ जावा वर्जन के झगड़े को खत्म कर देगी
         chmod +x gradlew
-        ./gradlew assembleDebug --no-daemon
+        ./gradlew assembleDebug --no-daemon -Dorg.gradle.java.home=$JAVA_HOME
 
     - name: Upload Finished APK Artifact
       uses: actions/upload-artifact@v4
