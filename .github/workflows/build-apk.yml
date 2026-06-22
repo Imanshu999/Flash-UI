@@ -14,7 +14,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Set up Node.js
-      uses: setup-node@v4
+      uses: actions/setup-node@v4
       with:
         node-version: 18
 
@@ -24,33 +24,29 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Install Project Dependencies
+    - name: Install Dependencies
       run: |
         npm install
         npm install lucide-react @capacitor/core @capacitor/cli @capacitor/android
 
-    - name: Clean Start
+    - name: Force Clean Build
       run: |
-        # पुरानी कचरा फ़ाइलों को साफ़ कर रहे हैं
+        # 1. पुरानी सारी बिल्ड फाइलें डिलीट
         rm -rf android/app/build/
+        # 2. कचरा लाइन हटाना
         sed -i '/<ChatContainer/d' src/App.jsx || true
+        # 3. वेब बिल्ड
+        npx vite build
+        # 4. कैपेसिटर को फोर्स सिंक करना
+        npx cap sync android --force
 
-    - name: Build Web Application
-      run: npx vite build
-
-    - name: Capacitor Sync
-      run: |
-        npx cap telemetry off
-        npx cap sync android
-
-    - name: Build Debug APK via Gradle
+    - name: Build APK
       run: |
         cd android
         chmod +x gradlew
-        # --info जोड़ दिया है ताकि अगर फिर भी फेल हो, तो बताए कि असल में किस फाइल में एरर है
-        ./gradlew assembleDebug --no-daemon --info
-        
-    - name: Upload Finished APK Artifact
+        ./gradlew assembleDebug --no-daemon
+
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: Flash-UI-Debug-APK
