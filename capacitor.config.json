@@ -1,0 +1,6 @@
+{
+  "appId": "com.takano3d.flashui",
+  "appName": "Flash-UI",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
