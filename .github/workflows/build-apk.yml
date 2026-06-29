@@ -19,10 +19,14 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      # Fix: npm ci का उपयोग करें, यह package-lock.json का उपयोग करके तेज़ी से और सुरक्षित डिपेंडेंसी इंस्टॉल करता है
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
+      # यहाँ हमने आपकी API Key को सुरक्षित तरीके से इंजेक्ट किया है
       - name: Build Web Application
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: npm run build
 
       - name: Setup Java
