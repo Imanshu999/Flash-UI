@@ -22,7 +22,6 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # Android और Capacitor CLI इंस्टॉल करें
       - name: Install Capacitor Android
         run: npm install @capacitor/android @capacitor/cli
 
@@ -31,7 +30,6 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: npm run build
 
-      # Java 21 का उपयोग करें
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -41,13 +39,15 @@ jobs:
       - name: Add and Sync Android Platform
         run: |
           npx cap add android
+          # Kotlin वर्जन फिक्स करने के लिए Gradle में फोर्स कमांड जोड़ना
+          echo "subprojects { configurations.all { resolutionStrategy { force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22' } } }" >> android/build.gradle
           npx cap sync android
 
       - name: Build Android APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew clean assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
