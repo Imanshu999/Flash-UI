@@ -38,9 +38,11 @@ jobs:
 
       - name: Add and Sync Android Platform
         run: |
-          npx cap add android
-          # Kotlin वर्जन फिक्स करने के लिए Gradle में फोर्स कमांड जोड़ना
-          echo "subprojects { configurations.all { resolutionStrategy { force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22' } } }" >> android/build.gradle
+          # अगर android फोल्डर नहीं है, तभी add करें
+          if [ ! -d "android" ]; then
+            npx cap add android
+            echo "subprojects { configurations.all { resolutionStrategy { force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22' } } }" >> android/build.gradle
+          fi
           npx cap sync android
 
       - name: Build Android APK
