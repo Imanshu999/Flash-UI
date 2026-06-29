@@ -22,9 +22,6 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Install Capacitor Android
-        run: npm install @capacitor/android @capacitor/cli
-
       - name: Build Web Application
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -36,21 +33,22 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      # यहाँ हमने Android प्लेटफॉर्म को फिर से सेटअप करने का प्रोसेस सुधारा है
       - name: Add and Sync Android Platform
         run: |
+          npm install @capacitor/android @capacitor/cli
           if [ ! -d "android" ]; then
             npx cap add android
-            echo "subprojects { configurations.all { resolutionStrategy { force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22' } } }" >> android/build.gradle
           fi
+          # Kotlin वर्जन फिक्स करने के लिए लाइन जोड़ें
+          echo "subprojects { configurations.all { resolutionStrategy { force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22' } } }" >> android/build.gradle
           npx cap sync android
 
+      # बिल्ड से पहले gradlew को फिर से इनिशियलाइज़ करना
       - name: Build Android APK
         run: |
           cd android
-          # Gradle Wrapper सुनिश्चित करें
-          if [ ! -f "gradlew" ]; then
-            gradle wrapper
-          fi
+          gradle wrapper
           chmod +x gradlew
           ./gradlew clean assembleDebug
 
