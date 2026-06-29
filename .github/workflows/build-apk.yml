@@ -17,7 +17,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install Dependencies
         run: npm install
@@ -33,27 +32,28 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      # यहाँ Gradle इंस्टॉल कर रहे हैं ताकि dependency न रहे
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
-
-      - name: Add and Sync Android Platform
+      # यहाँ हम पहले Android प्लैटफॉर्म को साफ़ करेंगे और फिर से बनाएंगे
+      - name: Prepare Android Platform
         run: |
+          rm -rf android
           npm install @capacitor/android @capacitor/cli
-          if [ ! -d "android" ]; then
-            npx cap add android
-            echo "subprojects { configurations.all { resolutionStrategy { force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22' } } }" >> android/build.gradle
-          fi
+          npx cap add android
           npx cap sync android
 
-      # gradlew के बजाय सीधे gradle कमांड का इस्तेमाल
+      # Kotlin वर्जन फिक्स करने वाली लाइन को app module की build.gradle में डालें
+      - name: Patch Gradle
+        run: |
+          echo "subprojects { configurations.all { resolutionStrategy { force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22' } } }" >> android/build.gradle
+
+      # बिल्ड कमांड को 'app' फोल्डर के अंदर चलाएं
       - name: Build Android APK
         run: |
           cd android
-          gradle assembleDebug
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: FlashUI-Final-APK
+          name: FlashUI-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
