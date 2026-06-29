@@ -38,7 +38,6 @@ jobs:
 
       - name: Add and Sync Android Platform
         run: |
-          # अगर android फोल्डर नहीं है, तभी add करें
           if [ ! -d "android" ]; then
             npx cap add android
             echo "subprojects { configurations.all { resolutionStrategy { force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22' } } }" >> android/build.gradle
@@ -48,6 +47,10 @@ jobs:
       - name: Build Android APK
         run: |
           cd android
+          # Gradle Wrapper सुनिश्चित करें
+          if [ ! -f "gradlew" ]; then
+            gradle wrapper
+          fi
           chmod +x gradlew
           ./gradlew clean assembleDebug
 
