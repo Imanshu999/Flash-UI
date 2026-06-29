@@ -33,23 +33,24 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      # यहाँ Gradle इंस्टॉल कर रहे हैं ताकि dependency न रहे
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+
       - name: Add and Sync Android Platform
         run: |
           npm install @capacitor/android @capacitor/cli
-          # अगर फोल्डर नहीं है तो बनाएं
           if [ ! -d "android" ]; then
             npx cap add android
             echo "subprojects { configurations.all { resolutionStrategy { force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22' } } }" >> android/build.gradle
           fi
           npx cap sync android
 
+      # gradlew के बजाय सीधे gradle कमांड का इस्तेमाल
       - name: Build Android APK
         run: |
           cd android
-          # यहाँ पर हम पक्का कर रहे हैं कि gradlew बने
-          ./gradlew wrapper --gradle-version 8.5
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          gradle assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
