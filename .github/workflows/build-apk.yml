@@ -22,7 +22,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # Android के लिए जरूरी पैकेज इंस्टॉल करें
+      # Android और Capacitor CLI इंस्टॉल करें
       - name: Install Capacitor Android
         run: npm install @capacitor/android @capacitor/cli
 
@@ -31,11 +31,12 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: npm run build
 
+      # Java 21 का उपयोग करें
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Add and Sync Android Platform
         run: |
