@@ -19,9 +19,12 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      # dependencies को इंस्टॉल करने का बेहतर तरीका
       - name: Install Dependencies
         run: npm install
+
+      # Android के लिए जरूरी पैकेज इंस्टॉल करें
+      - name: Install Capacitor Android
+        run: npm install @capacitor/android @capacitor/cli
 
       - name: Build Web Application
         env:
@@ -34,13 +37,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # यहाँ हमने स्पष्ट रूप से Capacitor CLI को इंस्टॉल किया है ताकि npx cap काम करे
       - name: Add and Sync Android Platform
         run: |
-          npm install -g @capacitor/cli
-          if [ ! -d "android" ]; then
-            npx cap add android
-          fi
+          npx cap add android
           npx cap sync android
 
       - name: Build Android APK
