@@ -19,9 +19,9 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      # यहाँ हमने --no-package-lock का उपयोग किया है ताकि पुरानी लॉक फाइल से झगड़ा न हो
+      # dependencies को इंस्टॉल करने का बेहतर तरीका
       - name: Install Dependencies
-        run: npm install --no-package-lock
+        run: npm install
 
       - name: Build Web Application
         env:
@@ -34,8 +34,10 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # यहाँ हमने स्पष्ट रूप से Capacitor CLI को इंस्टॉल किया है ताकि npx cap काम करे
       - name: Add and Sync Android Platform
         run: |
+          npm install -g @capacitor/cli
           if [ ! -d "android" ]; then
             npx cap add android
           fi
